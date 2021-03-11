@@ -8,9 +8,9 @@ class DiscountCodeBase(BaseModel):
     is_active: Optional[bool] = None
     brand_id: int
 
+    class Config:
+        orm_mode = True
+
 
 class DiscountCode(DiscountCodeBase):
     id: int
-
-    class Config:
-        orm_mode = True

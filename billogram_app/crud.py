@@ -2,12 +2,19 @@ from sqlalchemy.orm import Session
 from . import models, schemas
 
 
-def get_discount_code(db: Session, brand_id: int):
+def get_discount_code(
+    db: Session,
+    brand_id: int
+):
     return db.query(models.DiscountCode).filter(
         models.DiscountCode.brand_id==brand_id
     ).first()
 
-def create_discount_code(db: Session, code: str, brand_id: int):
+def create_discount_code(
+    db: Session,
+    code: str,
+    brand_id: int
+):
     db_discount_code = models.DiscountCode(
         code=code,
         is_active=True,

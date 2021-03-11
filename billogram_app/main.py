@@ -30,16 +30,54 @@ def create_discount_codes(
     brand_id: int,
     no_of_codes: int = 10,
     db: Session = Depends(get_db)
-):
-    codes = helpers.generate_discount_codes(no_of_codes)
+) -> List[str]:
+    """Generates a specified number of discount codes for a certain brand
+
+    Args:
+        brand_id (int): The ID for the brand the codes belongs to
+        no_of_codes (int, optional): Number of codes that will be generated. Defaults to 10.
+        db (Session, optional): Database session to be used in the request.
+
+    Returns:
+        A list with the generated codes as strings. For example:
+        [
+            "ZFFV3C",
+            "SGE8YR",
+            "YBY6SU",
+            "O0G0SJ",
+            "K5RJGA"
+        ]
+    """
+    codes: List[str] = helpers.generate_discount_codes(no_of_codes)
     for code in codes:
         crud.create_discount_code(db=db, code=code, brand_id=brand_id)
     return codes
 
 
 @app.get("/discount_codes/get_code/{brand_id}", response_model=schemas.DiscountCode)
-def get_discount_code(brand_id: int, db: Session = Depends(get_db)):
+def get_discount_code(
+    brand_id: int,
+    db: Session = Depends(get_db)
+) -> schemas.DiscountCode:
+    """On request returns a discount code for a certain brand
+
+    Args:
+        brand_id (int): ID for the brand
+        db (Session, optional): Database session to be used in the request.
+
+    Raises:
+        HTTPException: This exception will be raised if the specified brand has no discount codes
+
+    Returns:
+        schemas.DiscountCode: A dict representation of the discount object in the database. For example:
+        {
+            "code": "9U6QH9",
+            "is_active": true,
+            "brand_id": 2,
+            "id": 6
+        }
+    """
     db_discount_code = crud.get_discount_code(db=db, brand_id=brand_id)
     if db_discount_code is None:
-        raise HTTPException(status_code=404, detail='This brand has no created discount codes!')
+        raise HTTPException(status_code=404, detail='This brand has no available discount codes.')
     return db_discount_code
